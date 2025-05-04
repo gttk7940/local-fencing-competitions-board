@@ -272,7 +272,7 @@ export const CompetitionsRegisterForm = ({
             </Field.ErrorText>
           </Field.Root>
           <Field.Root invalid={!!formState.errors.url}>
-            <Field.Label>大会ページURL (任意)</Field.Label>
+            <Field.Label>大会ページ URL (任意)</Field.Label>
             <Input
               {...register('url')}
               placeholder="300 文字まで入力できます"
