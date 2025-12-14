@@ -7,7 +7,10 @@ const eventCategoryEnum = z.enum(eventCategories)
 const genderCategoryEnum = z.enum(genderCategories)
 const ageCategoryEnum = z.enum(ageCategories)
 
-const defaultDate = new Date(2025, 0, 1)
+const requiredDate = (message: string) =>
+  z
+    .union([z.date(), z.null()])
+    .refine((val): val is Date => val !== null, { message })
 
 export const competitionSchema = z.object({
   name: z
@@ -25,19 +28,9 @@ export const competitionSchema = z.object({
     .array(genderCategoryEnum)
     .min(1, '少なくとも 1 つ選んでください'),
   ageCategory: z.array(ageCategoryEnum).min(1, '少なくとも 1 つ選んでください'),
-  startDate: z.date().refine((val) => val.getTime() !== defaultDate.getTime(), {
-    message: '開始日は必須です',
-  }),
-  finishDate: z
-    .date()
-    .refine((val) => val.getTime() !== defaultDate.getTime(), {
-      message: '終了日は必須です',
-    }),
-  subscriptionDeadlineDate: z
-    .date()
-    .refine((val) => val.getTime() !== defaultDate.getTime(), {
-      message: '申込締切日は必須です',
-    }),
+  startDate: requiredDate('開始日は必須です'),
+  finishDate: requiredDate('終了日は必須です'),
+  subscriptionDeadlineDate: requiredDate('申込締切日は必須です'),
   url: z
     .string()
     .max(300, '300 文字以内で入力してください')
@@ -56,9 +49,9 @@ export const defaultValues: CompetitionForm = {
   eventCategory: [],
   genderCategory: [],
   ageCategory: [],
-  startDate: defaultDate,
-  finishDate: defaultDate,
-  subscriptionDeadlineDate: defaultDate,
+  startDate: null,
+  finishDate: null,
+  subscriptionDeadlineDate: null,
   url: '',
   notes: '',
 }

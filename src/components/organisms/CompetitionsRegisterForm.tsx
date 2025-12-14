@@ -15,12 +15,14 @@ import { Controller } from 'react-hook-form'
 import { collection, doc, Firestore, setDoc } from 'firebase/firestore'
 import {
   ageCategories,
-  CompetitionRegisterForm,
   CompetitionWithoutId,
   eventCategories,
   genderCategories,
 } from '../../util/types'
-import { useCompetitionsRegisterForm } from '../../hooks/useCompetitionsRegisterForm'
+import {
+  CompetitionForm,
+  useCompetitionsRegisterForm,
+} from '../../hooks/useCompetitionsRegisterForm'
 import { Toaster, toaster } from '../ui/toaster'
 
 type CompetitionsRegisterFormArgs = {
@@ -72,10 +74,25 @@ export const CompetitionsRegisterForm = ({
     })
   }
 
-  const onSubmit = async (formData: CompetitionRegisterForm) => {
+  const onSubmit = async (formData: CompetitionForm) => {
+    const {
+      startDate,
+      finishDate,
+      subscriptionDeadlineDate,
+      ...rest
+    } = formData
+
+    if (!startDate || !finishDate || !subscriptionDeadlineDate) {
+      createErrorToast()
+      return
+    }
+
     try {
       const competionWithoutId: CompetitionWithoutId = {
-        ...formData,
+        ...rest,
+        startDate,
+        finishDate,
+        subscriptionDeadlineDate,
         registrationDate: new Date(),
       }
 
@@ -215,7 +232,7 @@ export const CompetitionsRegisterForm = ({
           </Fieldset.Root>
 
           <Field.Root invalid={!!formState.errors.startDate}>
-            <Field.Label>大会開始日 (変更必須)</Field.Label>
+            <Field.Label>大会開始日 (必須)</Field.Label>
             <Controller
               name="startDate"
               control={control}
@@ -234,7 +251,7 @@ export const CompetitionsRegisterForm = ({
             </Field.ErrorText>
           </Field.Root>
           <Field.Root invalid={!!formState.errors.finishDate}>
-            <Field.Label>大会終了日 (変更必須)</Field.Label>
+            <Field.Label>大会終了日 (必須)</Field.Label>
             <Controller
               name="finishDate"
               control={control}
@@ -253,7 +270,7 @@ export const CompetitionsRegisterForm = ({
             </Field.ErrorText>
           </Field.Root>
           <Field.Root invalid={!!formState.errors.subscriptionDeadlineDate}>
-            <Field.Label>申込締切日 (変更必須)</Field.Label>
+            <Field.Label>申込締切日 (必須)</Field.Label>
             <Controller
               name="subscriptionDeadlineDate"
               control={control}
