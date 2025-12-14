@@ -12,17 +12,14 @@ import {
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Controller } from 'react-hook-form'
-import { collection, doc, Firestore, setDoc } from 'firebase/firestore'
+import { Firestore } from 'firebase/firestore'
 import {
   ageCategories,
-  CompetitionWithoutId,
   eventCategories,
   genderCategories,
 } from '../../util/types'
-import {
-  CompetitionForm,
-  useCompetitionsRegisterForm,
-} from '../../hooks/useCompetitionsRegisterForm'
+import { useCompetitionsRegisterForm } from '../../hooks/useCompetitionsRegisterForm'
+import { useSubmitCompetition } from '../../hooks/useSubmitCompetition'
 import { Toaster, toaster } from '../ui/toaster'
 
 type CompetitionsRegisterFormArgs = {
@@ -50,6 +47,15 @@ export const CompetitionsRegisterForm = ({
     genderCategory,
     ageCategory,
   } = useCompetitionsRegisterForm()
+  const { submitCompetition } = useSubmitCompetition({
+    db,
+    onSuccess: (deleteCode) => {
+      reset()
+      createSuccessToast(deleteCode)
+    },
+    onError: () => createErrorToast(),
+    reset,
+  })
 
   const createSuccessToast = (deleteCode: string) => {
     toaster.create({
@@ -74,55 +80,9 @@ export const CompetitionsRegisterForm = ({
     })
   }
 
-  const onSubmit = async (formData: CompetitionForm) => {
-    const {
-      startDate,
-      finishDate,
-      subscriptionDeadlineDate,
-      ...rest
-    } = formData
-
-    if (!startDate || !finishDate || !subscriptionDeadlineDate) {
-      createErrorToast()
-      return
-    }
-
-    try {
-      const competionWithoutId: CompetitionWithoutId = {
-        ...rest,
-        startDate,
-        finishDate,
-        subscriptionDeadlineDate,
-        registrationDate: new Date(),
-      }
-
-      // 削除コードの生成
-      // const deleteCode = Math.floor(Math.random() * 1000000).toString().padStart(6, '0') // 6 桁のランダムな整数を生成
-      const deleteCode = '123456' // 動作確認用
-      const deleteCodeObject = {
-        deleteCode: deleteCode,
-      }
-
-      // ドキュメント ID の生成
-      const newCompetitionDoc = doc(collection(db, 'competitions'))
-      const newDocId = newCompetitionDoc.id
-
-      // 登録
-      await Promise.all([
-        setDoc(doc(db, 'competitions', newDocId), competionWithoutId),
-        setDoc(doc(db, 'deleteCodes', newDocId), deleteCodeObject),
-      ])
-      reset()
-      createSuccessToast(deleteCode)
-    } catch (error) {
-      console.error(error)
-      createErrorToast()
-    }
-  }
-
   return (
     <Box>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(submitCompetition)}>
         <Stack gap="30px">
           <Field.Root invalid={!!formState.errors.name}>
             <Field.Label>大会名 (必須)</Field.Label>
