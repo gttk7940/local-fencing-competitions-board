@@ -9,7 +9,7 @@ import {
   deleteDoc,
   doc,
 } from 'firebase/firestore'
-import { useGetCompetitions } from '../../hooks/useGetCompetions'
+import { useGetCompetitions } from '../../hooks/useGetCompetitions'
 import { Caution } from '../organisms/Caution'
 import { CompetitionsTable } from '../organisms/CompetitionsTable/CompetitionsTable'
 import { Information } from '../organisms/Information'
