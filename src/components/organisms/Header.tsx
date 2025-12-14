@@ -9,10 +9,10 @@ export const Header = () => {
           フェンシング ローカル大会掲示板
         </Heading>
         <Flex gap="10px">
-          <Button>
+          <Button asChild>
             <Link to="/">大会を探す</Link>
           </Button>
-          <Button>
+          <Button asChild>
             <Link to="/new">大会を登録する</Link>
           </Button>
         </Flex>
