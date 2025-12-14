@@ -20,12 +20,8 @@ export const useSubmitCompetition = ({
   reset,
 }: UseSubmitCompetitionArgs): UseSubmitCompetition => {
   const submitCompetition = async (formData: CompetitionForm) => {
-    const {
-      startDate,
-      finishDate,
-      subscriptionDeadlineDate,
-      ...rest
-    } = formData
+    const { startDate, finishDate, subscriptionDeadlineDate, ...rest } =
+      formData
 
     if (!startDate || !finishDate || !subscriptionDeadlineDate) {
       onError()
